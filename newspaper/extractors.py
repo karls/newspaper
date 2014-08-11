@@ -21,7 +21,7 @@ import urlparse
 
 from . import urls
 
-from dateutil import parse
+from dateutil.parse import parse
 
 from .packages.tldextract import tldextract
 from .utils import ReplaceSequence, StringReplacement, StringSplitter
