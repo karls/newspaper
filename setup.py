@@ -34,7 +34,8 @@ requires = [
     'nltk',
     'Pillow',
     'cssselect',
-    'BeautifulSoup'
+    'BeautifulSoup',
+    'python-dateutil'
 ]
 
 readme = u''
