@@ -13,7 +13,9 @@ __copyright__ = 'Copyright 2014, Lucas Ou-Yang'
 
 from collections import defaultdict
 import copy
+import itertools
 import logging
+import operator
 import re
 import urlparse
 
@@ -314,12 +316,34 @@ class ContentExtractor(object):
     def get_meta_description(self, doc):
         """If the article has meta description set in the source, use that
         """
-        return self.get_meta_content(doc, "meta[name=description]")
+        meta_data = self.get_meta_data(doc)
+        d = meta_data.get('description')
+        if d is None:
+            d = md.get('og', {}).get('description')
+        return d
+        # return self.get_meta_content(doc, "meta[name=description]")
 
     def get_meta_keywords(self, doc):
         """If the article has meta keywords set in the source, use that
         """
         return self.get_meta_content(doc, "meta[name=keywords]")
+
+    def get_published_date(self, doc):
+        # 2014-08-08T12:32:53Z
+        date_re = re.compile(r"""(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?)|
+                                 (\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})""", re.X)
+        matches = date_re.search(doc)
+        if not matches:
+            return None
+
+        date_strings = filter(lambda x: x is not None, matches.groups())
+        dates = sorted(map(parse, date_strings))
+        grouped_dates = itertools.groupby(dates)
+        groups = {}
+        for k, g in grouped_dates:
+            groups[len(list(g))] = k
+        most_frequent_date = max(groups.keys())
+        return groups[most_frequent_date]
 
     def get_meta_data(self, doc):
         data = defaultdict(dict)
@@ -331,7 +355,7 @@ class ContentExtractor(object):
             if not key or not value:
                 continue
 
-            key, value = key.strip(), value.strip()
+            key, value = key.strip().lower(), value.strip()
             if value.isdigit():
                 value = int(value)
 

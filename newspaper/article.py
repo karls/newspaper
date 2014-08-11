@@ -169,6 +169,9 @@ class Article(object):
         document_cleaner = DocumentCleaner(self.config)
         output_formatter = OutputFormatter(self.config)
 
+        meta_data = self.extractor.get_meta_data(self.clean_doc)
+        self.set_meta_data(meta_data)
+
         title = self.extractor.get_title(self.clean_doc)
         self.set_title(title)
 
@@ -185,8 +188,7 @@ class Article(object):
         meta_favicon = self.extractor.get_favicon(self.clean_doc)
         self.set_meta_favicon(meta_favicon)
 
-        meta_description = \
-            self.extractor.get_meta_description(self.clean_doc)
+        meta_description = self.extractor.get_meta_description(self.clean_doc)
         self.set_meta_description(meta_description)
 
         canonical_link = self.extractor.get_canonical_link(
@@ -196,14 +198,12 @@ class Article(object):
         tags = self.extractor.extract_tags(self.clean_doc)
         self.set_tags(tags)
 
-        meta_keywords = self.extractor.get_meta_keywords(
-            self.clean_doc)
+        meta_keywords = self.meta_data.get('keywords', '')
+        # self.extractor.get_meta_keywords(
+        #     self.clean_doc)
         self.set_meta_keywords(meta_keywords)
 
-        meta_data = self.extractor.get_meta_data(self.clean_doc)
-        self.set_meta_data(meta_data)
-
-        # TODO self.publish_date = ...
+        self.published_date = self.extractor.get_published_date(self.html)
 
         # Before any computations on the body, clean DOM object
         self.doc = document_cleaner.clean(self.doc)
