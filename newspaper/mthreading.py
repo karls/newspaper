@@ -126,7 +126,7 @@ class ImagePool(object):
     def __init__(self):
         self.urls = []
         self.pool = None
-        self.img_sizes = {}
+        self.img_sizes = []
 
     def join(self):
         """
@@ -146,7 +146,8 @@ class ImagePool(object):
         i = Image.open(StringIO(resp.content))
         total_pixels = int(i.size[0]) * int(i.size[1])
         if total_pixels > 8000:
-            self.img_sizes[url] = i.size
+            self.img_sizes.append([url, {'width': i.size[0],
+                                         'height': i.size[1]}])
 
 
     def set(self, url_list, threads_per_source=1):
