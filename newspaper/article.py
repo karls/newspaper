@@ -18,6 +18,7 @@ from . import urls
 from .cleaners import DocumentCleaner
 from .configuration import Configuration
 from .extractors import ContentExtractor
+from .mthreading import ImagePool
 from .outputformatters import OutputFormatter
 from .utils import (URLHelper, encodeValue, RawHelper, extend_config,
                     get_available_languages)
@@ -421,6 +422,10 @@ class Article(object):
         imgs = [encodeValue(i) for i in imgs]
         self.images = imgs
         self.imgs = imgs
+        size_calculator = ImagePool()
+        size_calculator.set(self.images)
+        size_calculator.join()
+        self.image_sizes = size_calculator.img_sizes
 
     def set_keywords(self, keywords):
         """Keys are stored in list format

@@ -12,6 +12,9 @@ __copyright__ = 'Copyright 2014, Lucas Ou-Yang'
 import Queue
 from threading import Thread
 
+import requests
+from PIL import Image
+from StringIO import StringIO
 
 class Worker(Thread):
     """
@@ -116,3 +119,53 @@ class NewsPool(object):
 
         for paper in self.papers:
             self.pool.add_task(paper.download_articles)
+
+
+class ImagePool(object):
+
+    def __init__(self):
+        self.urls = []
+        self.pool = None
+        self.img_sizes = {}
+
+    def join(self):
+        """
+        Runs the mtheading and returns when all threads have joined
+        resets the task.
+        """
+        if self.pool is None:
+            print 'Call set(..) with a list of source objects before .join(..)'
+            raise
+        self.pool.wait_completion()
+        self.urls = []
+        self.pool = None
+
+
+    def calculate_size(self, url):
+        resp = requests.get(url)
+        i = Image.open(StringIO(resp.content))
+        total_pixels = int(i.size[0]) * int(i.size[1])
+        if total_pixels > 8000:
+            self.img_sizes[url] = i.size
+
+
+    def set(self, url_list, threads_per_source=1):
+        """
+        Sets the job batch.
+        """
+        self.urls = url_list
+        num_threads = threads_per_source * len(self.urls)
+        self.pool = ThreadPool(num_threads)
+
+        for url in self.urls:
+            self.pool.add_task(self.calculate_size, url)
+
+# def test_image_pool():
+#     from newspaper import Article
+#     # a = Article(url="http://www.theguardian.com/world/2014/aug/12/russian-convoy-heads-for-ukraine")
+#     a = Article(url="http://www.bbc.co.uk/news/uk-england-manchester-28755375")
+#     a.build()
+#     pool = ImagePool()
+#     pool.set(a.images)
+#     pool.join()
+#     return pool.img_sizes
