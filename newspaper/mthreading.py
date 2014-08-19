@@ -125,7 +125,8 @@ class ImagePool(object):
 
     def __init__(self):
         self.urls = []
-        self.pool = None
+        num_threads = 8 #threads_per_source * len(self.urls)
+        self.pool = ThreadPool(num_threads)
         self.img_sizes = []
 
     def join(self):
@@ -138,7 +139,6 @@ class ImagePool(object):
             raise
         self.pool.wait_completion()
         self.urls = []
-        self.pool = None
 
 
     def calculate_size(self, url):
@@ -154,10 +154,7 @@ class ImagePool(object):
         Sets the job batch.
         """
         self.urls = url_list
-        print(len(self.urls))
-        num_threads = 24 #threads_per_source * len(self.urls)
-        self.pool = ThreadPool(num_threads)
-
+        self.img_sizes = []
         for url in self.urls:
             self.pool.add_task(self.calculate_size, url)
 
