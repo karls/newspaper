@@ -125,7 +125,7 @@ class ImagePool(object):
 
     def __init__(self):
         self.urls = []
-        num_threads = 8 #threads_per_source * len(self.urls)
+        num_threads = 24 #threads_per_source * len(self.urls)
         self.pool = ThreadPool(num_threads)
         self.img_sizes = []
 
