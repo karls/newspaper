@@ -158,6 +158,8 @@ class ImagePool(object):
         for url in self.urls:
             self.pool.add_task(self.calculate_size, url)
 
+image_size_calculator = ImagePool()
+
 # def test_image_pool():
 #     from newspaper import Article
 #     # a = Article(url="http://www.theguardian.com/world/2014/aug/12/russian-convoy-heads-for-ukraine")
