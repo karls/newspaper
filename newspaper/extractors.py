@@ -331,7 +331,6 @@ class ContentExtractor(object):
         return self.get_meta_content(doc, "meta[name=keywords]")
 
     def get_published_date(self, doc):
-        # 2014-08-08T12:32:53Z
         date_re = re.compile(r"""(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?)|
                                  (\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})""", re.X)
         matches = date_re.search(doc)

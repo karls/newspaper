@@ -154,7 +154,8 @@ class ImagePool(object):
         Sets the job batch.
         """
         self.urls = url_list
-        num_threads = threads_per_source * len(self.urls)
+        print(len(self.urls))
+        num_threads = 24 #threads_per_source * len(self.urls)
         self.pool = ThreadPool(num_threads)
 
         for url in self.urls:
