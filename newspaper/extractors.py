@@ -321,7 +321,7 @@ class ContentExtractor(object):
         meta_data = self.get_meta_data(doc)
         d = meta_data.get('description')
         if d is None:
-            d = md.get('og', {}).get('description')
+            d = meta_data.get('og', {}).get('description')
         return d
         # return self.get_meta_content(doc, "meta[name=description]")
 
