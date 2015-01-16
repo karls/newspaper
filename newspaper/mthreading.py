@@ -11,6 +11,7 @@ __copyright__ = 'Copyright 2014, Lucas Ou-Yang'
 
 import Queue
 from threading import Thread
+from multiprocessing import Pool
 
 import requests
 from PIL import Image
@@ -159,7 +160,12 @@ class ImagePool(object):
         for url in self.urls:
             self.pool.add_task(self.calculate_size, url)
 
-image_size_calculator = ImagePool()
+def calculate_size(url):
+    resp = requests.get(url)
+    i = Image.open(StringIO(resp.content))
+    total_pixels = int(i.size[0]) * int(i.size[1])
+    if total_pixels > 8000:
+        return {'src': url, 'width': i.size[0], 'height': i.size[1]}
 
 # def test_image_pool():
 #     from newspaper import Article

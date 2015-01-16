@@ -8,6 +8,7 @@ import logging
 import copy
 import os
 import glob
+import requests
 
 from . import images
 from . import network
@@ -18,14 +19,22 @@ from . import urls
 from .cleaners import DocumentCleaner
 from .configuration import Configuration
 from .extractors import ContentExtractor
-from .mthreading import ImagePool, image_size_calculator
 from .outputformatters import OutputFormatter
 from .utils import (URLHelper, encodeValue, RawHelper, extend_config,
                     get_available_languages)
 from .videos.extractors import VideoExtractor
 
+from PIL import Image
+from StringIO import StringIO
+
 log = logging.getLogger(__name__)
 
+def calculate_image_size(url):
+    resp = requests.get(url)
+    i = Image.open(StringIO(resp.content))
+    total_pixels = int(i.size[0]) * int(i.size[1])
+    if total_pixels > 8000:
+        return {'src': url, 'width': i.size[0], 'height': i.size[1]}
 
 class ArticleException(Exception):
     pass
@@ -34,12 +43,14 @@ class ArticleException(Exception):
 class Article(object):
     """Article objects abstract an online news article page
     """
-    def __init__(self, url, title=u'', source_url=u'', config=None, **kwargs):
+    def __init__(self, url, title=u'', source_url=u'', config=None, pool=None, **kwargs):
         """The **kwargs argument may be filled with config values, which
         is added into the config object
         """
         self.config = config or Configuration()
         self.config = extend_config(self.config, kwargs)
+
+        self.pool = pool
 
         self.extractor = ContentExtractor(self.config)
 
@@ -420,12 +431,19 @@ class Article(object):
         for both `article.imgs` and `article.images`
         """
         imgs = [encodeValue(i) for i in imgs]
-        self.images = imgs
-        self.imgs = imgs
-        # size_calculator = ImagePool()
-        image_size_calculator.set(self.images)
-        image_size_calculator.join()
-        self.image_sizes = image_size_calculator.img_sizes
+        urls_with_sizes = self.pool.map(calculate_image_size, imgs)
+        all_pairs = zip(imgs, urls_with_sizes)
+
+        # Images with good sizes
+        good_pairs = filter(lambda x: x[1] is not None, all_pairs)
+        print good_pairs
+
+        # URLs
+        self.images = map(lambda x: x[0], good_pairs)
+        self.imgs = self.images
+
+        # src-width-height triples
+        self.image_sizes = map(lambda x: x[1], good_pairs)
 
     def set_keywords(self, keywords):
         """Keys are stored in list format
