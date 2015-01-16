@@ -54,8 +54,10 @@ class Article(object):
         self.config = extend_config(self.config, kwargs)
 
         if pool is None:
+            print "Using a dummy threadpool"
             self.pool = DummyPool()
         else:
+            print "Using a provided threadpool"
             self.pool = pool
 
         self.extractor = ContentExtractor(self.config)
@@ -442,7 +444,6 @@ class Article(object):
 
         # Images with good sizes
         good_pairs = filter(lambda x: x[1] is not None, all_pairs)
-        print good_pairs
 
         # URLs
         self.images = map(lambda x: x[0], good_pairs)
