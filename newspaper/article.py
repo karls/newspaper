@@ -39,6 +39,9 @@ def calculate_image_size(url):
 class ArticleException(Exception):
     pass
 
+class DummyPool(object):
+    def map(self, f, tasks):
+        return map(f, tasks)
 
 class Article(object):
     """Article objects abstract an online news article page
@@ -50,7 +53,10 @@ class Article(object):
         self.config = config or Configuration()
         self.config = extend_config(self.config, kwargs)
 
-        self.pool = pool
+        if pool is None:
+            self.pool = DummyPool()
+        else:
+            self.pool = pool
 
         self.extractor = ContentExtractor(self.config)
 
