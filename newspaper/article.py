@@ -31,7 +31,13 @@ log = logging.getLogger(__name__)
 
 def calculate_image_size(url):
     resp = requests.get(url)
-    i = Image.open(StringIO(resp.content))
+    try:
+        i = Image.open(StringIO(resp.content))
+    except IOError:
+        print "Error opening image at %s" % url
+        print "Ignoring"
+        return None
+
     total_pixels = int(i.size[0]) * int(i.size[1])
     if total_pixels > 8000:
         return {'src': url, 'width': i.size[0], 'height': i.size[1]}
