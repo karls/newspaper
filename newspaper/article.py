@@ -54,10 +54,8 @@ class Article(object):
         self.config = extend_config(self.config, kwargs)
 
         if pool is None:
-            print "Using a dummy threadpool"
             self.pool = DummyPool()
         else:
-            print "Using a provided threadpool"
             self.pool = pool
 
         self.extractor = ContentExtractor(self.config)
