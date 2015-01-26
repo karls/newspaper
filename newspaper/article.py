@@ -30,16 +30,17 @@ from StringIO import StringIO
 log = logging.getLogger(__name__)
 
 def calculate_image_size(url):
-    resp = requests.get(url)
     try:
+        resp = requests.get(url)
         i = Image.open(StringIO(resp.content))
     except IOError:
         print "Error opening image at %s" % url
-        print "Ignoring"
         return None
     except UnicodeEncodeError:
         print "Strange image format %s (encoding error, huh?)" % url
-        print "Ignoring"
+        return None
+    except requests.SSLError:
+        print "SSL cert mismatch for %s" % url
         return None
 
     total_pixels = int(i.size[0]) * int(i.size[1])
