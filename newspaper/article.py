@@ -37,6 +37,10 @@ def calculate_image_size(url):
         print "Error opening image at %s" % url
         print "Ignoring"
         return None
+    except UnicodeEncodeError:
+        print "Strange image format %s (encoding error, huh?)" % url
+        print "Ignoring"
+        return None
 
     total_pixels = int(i.size[0]) * int(i.size[1])
     if total_pixels > 8000:
