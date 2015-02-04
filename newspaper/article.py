@@ -39,6 +39,9 @@ def calculate_image_size(url):
     except UnicodeEncodeError:
         print "Strange image format %s (encoding error, huh?)" % url
         return None
+    except UnicodeDecodeError:
+        print "Strange image format %s (decoding error, huh?)" % url
+        return None
     except requests.SSLError:
         print "SSL cert mismatch for %s" % url
         return None
