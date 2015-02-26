@@ -450,19 +450,25 @@ class Article(object):
         """The motive for this method is the same as above, provide APIs
         for both `article.imgs` and `article.images`
         """
-        imgs = [encodeValue(i) for i in imgs]
-        urls_with_sizes = self.pool.map(calculate_image_size, imgs)
-        all_pairs = zip(imgs, urls_with_sizes)
+        # imgs = [encodeValue(i) for i in imgs]
+        # urls_with_sizes = self.pool.map(calculate_image_size, imgs)
+        # all_pairs = zip(imgs, urls_with_sizes)
 
-        # Images with good sizes
-        good_pairs = filter(lambda x: x[1] is not None, all_pairs)
+        # # Images with good sizes
+        # good_pairs = filter(lambda x: x[1] is not None, all_pairs)
 
-        # URLs
-        self.images = map(lambda x: x[0], good_pairs)
+        # # URLs
+        # self.images = map(lambda x: x[0], good_pairs)
+        # self.imgs = self.images
+
+        # # src-width-height triples
+        # self.image_sizes = map(lambda x: x[1], good_pairs)
+
+        self.images = []
         self.imgs = self.images
 
         # src-width-height triples
-        self.image_sizes = map(lambda x: x[1], good_pairs)
+        self.image_sizes = []
 
     def set_keywords(self, keywords):
         """Keys are stored in list format
